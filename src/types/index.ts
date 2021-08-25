@@ -28,9 +28,9 @@ export type Vector3 = {
 }
 
 export type MeshParameters = {
-    translation: Vector3,
-    rotation: Vector3,
-    scale: Vector3
+    position?: Vector3,
+    rotation?: Vector3,
+    scale?: Vector3
 }
 
 export type MeshConstructor = {
