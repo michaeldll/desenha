@@ -34,7 +34,7 @@ export type MeshParameters = {
 }
 
 export type MeshConstructor = {
-    program: WebGLProgram,
+    shaders: [string, string],
     locationNames: {
         attributes: string[]
         uniforms: string[]

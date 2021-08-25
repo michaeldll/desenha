@@ -1,5 +1,6 @@
 import { mat4 } from 'gl-matrix'
 import { Locations, Buffers, Geometry, MeshConstructor, DrawCallback } from "../types"
+import { getShaderProgram } from '../utils'
 
 export abstract class Mesh {
     name: string
@@ -15,14 +16,14 @@ export abstract class Mesh {
     scale: { x: number, y: number, z: number }
     onDrawCallbacks: DrawCallback[]
 
-    constructor({ program, name, locationNames, parameters, gl }: MeshConstructor) {
+    constructor({ shaders, name, locationNames, parameters, gl }: MeshConstructor) {
         this.geometry = {}
         this.buffers = {}
         this.locations = { attributes: {}, uniforms: {} }
         this.readyToRender = true
         this.onDrawCallbacks = []
 
-        this.program = program
+        this.program = getShaderProgram(gl, shaders[0], shaders[1])
 
         for (const attributeName of locationNames.attributes) {
             this.locations.attributes[attributeName] = gl.getAttribLocation(this.program, attributeName)
