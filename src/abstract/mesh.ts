@@ -33,7 +33,7 @@ export abstract class Mesh {
         }
 
         if (parameters) {
-            this.position = parameters.translation
+            this.position = parameters.position
             this.rotation = parameters.rotation
             this.scale = parameters.scale
         } else {
