@@ -11,7 +11,7 @@ then
 
 ```ts
 import Desenhador from "desenha"
-import Cube from "desenha/meshes/cube"
+import Cube from "desenha/dist/meshes/cube"
 
 // Renderer AKA "Desenhador"
 const renderer = new Desenhador()
