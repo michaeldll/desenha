@@ -2,7 +2,7 @@
 A (very) barebones WebGL framework.
 
 ## Why should I use this framework ?
-You probably don't want to.
+You probably shouldn't.
 
 ## How do I use this framework ?
 `npm i desenha`
