@@ -1,16 +1,22 @@
 # desenha
-A barebones WebGL framework.
+A (very) barebones WebGL framework.
+
 ## Why should I use this framework ?
 You probably don't want to.
 
+## How do I use this framework ?
 `npm i desenha`
+
+then
 
 ```ts
     import Desenhador from "desenha"
     import Cube from "desenha/meshes/cube"
 
+    // Renderer AKA "Desenhador"
     const renderer = new Desenhador()
 
+    // Shaders
     const vertex = `
         attribute vec4 aPosition;
 
@@ -21,16 +27,13 @@ You probably don't want to.
             gl_Position = uProjectionMatrix * uModelMatrix * aPosition;
         }
     `
-
     const fragment = `
         void main(void) {
             gl_FragColor = vec4(vec3(1.,0.,0.),1.);
         }
     `
 
-    // This array can be updated at any time
-    // and the meshes within will get drawn
-    // at render time
+    // These will get drawn at render time
     const meshes = []
 
     const cube = new Cube({
@@ -45,16 +48,19 @@ You probably don't want to.
         },
         gl: renderer.gl
     })
+
     // Executes callback each frame after being drawn
-    cube.addOnDrawCallback((mesh: Mesh, deltaTime: number) => {
+    cube.addOnDrawCallback((mesh, deltaTime) => {
         mesh.rotation.x += deltaTime * 0.5
         mesh.rotation.y += deltaTime
     })
+
     meshes.push(cube)
 
+    // Render loop
     let then = 0;
     const update = (now: number) => {
-        now *= 0.001;  // convert to seconds
+        now *= 0.001;  // Convert to seconds
         const deltaTime = now - then;
         then = now;
 
@@ -66,6 +72,7 @@ You probably don't want to.
     requestAnimationFrame(update);
 ```
 
+Tada ! You have drawn a red cube.
 ![Red cube](https://i.imgur.com/ZoJGlo6.png)
 
 ### What does 'desenha' mean ?
