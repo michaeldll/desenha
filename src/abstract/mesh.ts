@@ -32,14 +32,14 @@ export abstract class Mesh {
             this.locations.uniforms[uniformName] = gl.getUniformLocation(this.program, uniformName)
         }
 
+        this.position = { x: 0, y: 0, z: 0 }
+        this.rotation = { x: 0, y: 0, z: 0 }
+        this.scale = { x: 1, y: 1, z: 1 }
+
         if (parameters) {
-            this.position = parameters.position
-            this.rotation = parameters.rotation
-            this.scale = parameters.scale
-        } else {
-            this.position = { x: 0, y: 0, z: 0 }
-            this.rotation = { x: 0, y: 0, z: 0 }
-            this.scale = { x: 1, y: 1, z: 1 }
+            if (parameters.position) this.position = parameters.position
+            if (parameters.rotation) this.rotation = parameters.rotation
+            if (parameters.scale) this.scale = parameters.scale
         }
 
         name ? this.name = name : this.name = ""
