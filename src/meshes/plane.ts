@@ -2,8 +2,8 @@ import { Mesh } from "../abstract/mesh";
 import { MeshConstructor } from "../types";
 
 export default class Plane extends Mesh {
-    constructor({ program, locationNames, gl, parameters, name }: MeshConstructor) {
-        super({ program, locationNames, gl, parameters, name })
+    constructor({ shaders, locationNames, gl, parameters, name }: MeshConstructor) {
+        super({ shaders, locationNames, gl, parameters, name })
 
         this.geometry = {
             positions: new Float32Array([

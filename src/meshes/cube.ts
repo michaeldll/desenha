@@ -2,8 +2,8 @@ import { Mesh } from "../abstract/mesh";
 import { MeshConstructor } from "../types";
 
 export default class Cube extends Mesh {
-    constructor({ program, locationNames, gl, parameters, name }: MeshConstructor) {
-        super({ program, locationNames, gl, parameters, name })
+    constructor({ shaders, locationNames, gl, parameters, name }: MeshConstructor) {
+        super({ shaders, locationNames, gl, parameters, name })
 
         // [r, g, b, a]
         const faceColors = [
