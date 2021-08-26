@@ -7,7 +7,9 @@ You probably shouldn't.
 ## How do I use this framework ?
 `npm i desenha`
 
-then
+## Examples :
+
+Rotating cube :
 
 ```ts
 import Desenhador from "desenha"
@@ -36,6 +38,7 @@ const fragment = `
 // These will get drawn at render time
 const meshes = []
 
+// Init mesh
 const cube = new Cube({
     name: 'Red cube',
     shaders: [vertex, fragment],
@@ -72,8 +75,67 @@ const update = (now: number) => {
 requestAnimationFrame(update);
 ```
 
-Tada ! You have drawn a red cube.
 ![Red cube](https://i.imgur.com/ZoJGlo6.png)
+
+Load shaders from files, load .obj model and shade it :
+
+```ts
+const renderer = new Desenhador()
+const loader = new OBJLoader()
+const meshes = []
+
+fetchShaders('./assets/shaders/texturedShaded/vertex.glsl', './assets/shaders/texturedShaded/fragment.glsl').then(({ vertex, fragment }) => {
+    loader.load('assets/models/monitor.obj').then((geometry) => {
+        const parameters = {
+            position: { x: 0, y: 0, z: -1.5 },
+            rotation: { x: 0, y: -0.5, z: 0 },
+            scale: { x: 1, y: 1, z: 1 }
+        }
+        const loadedMesh = new Generic({
+            name: 'monitor',
+            shaders: [vertex, fragment],
+            locationNames: {
+                attributes: ['aPosition', 'aNormal', 'aUv'],
+                uniforms: [
+                    'uProjectionMatrix',
+                    'uModelMatrix',
+                    'uLightColor',
+                    'uLightDirection',
+                    'uBaseColor',
+                    'uAmbientLight',
+                    'uTexture'
+                ]
+            },
+            parameters,
+            geometry,
+            gl: renderer.gl
+        })
+
+        const setShading = (mesh, deltaTime) => {
+            // Base color
+            renderer.gl.uniform3f(mesh.locations.uniforms.uBaseColor, 1, 1, 1);
+
+            // Diffuse light color
+            renderer.gl.uniform3f(mesh.locations.uniforms.uLightColor, 2.5, 2.5, 2.5);
+
+            // Ambient light color
+            renderer.gl.uniform3f(mesh.locations.uniforms.uAmbientLight, 0.1, 0.1, 0.1);
+
+            // Light direction
+            renderer.gl.uniform3f(mesh.locations.uniforms.uLightDirection, 0, -1, 1);
+
+            // mesh.rotation.x += deltaTime
+        }
+        loadedMesh.addOnDrawCallback(setShading)
+
+        loadedMesh.loadTexture(renderer.gl, './assets/textures/crt_layout.jpg')
+
+        meshes.push(loadedMesh)
+    })
+})
+```
+
+![Shaded model](https://i.imgur.com/E9EdJXz.png)
 
 ### What does 'desenha' mean ?
 It means 'draw' in Portuguese.
