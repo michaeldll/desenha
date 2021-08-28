@@ -113,22 +113,22 @@ fetchShaders('./assets/shaders/texturedShaded/vertex.glsl', './assets/shaders/te
 
         const setShading = (mesh, deltaTime) => {
             // Base color
-            renderer.gl.uniform3f(mesh.locations.uniforms.uBaseColor, 1, 1, 1);
+            gl.uniform3f(mesh.locations.uniforms.uBaseColor, 1, 1, 1);
 
             // Diffuse light color
-            renderer.gl.uniform3f(mesh.locations.uniforms.uLightColor, 2.5, 2.5, 2.5);
+            gl.uniform3f(mesh.locations.uniforms.uLightColor, 2.5, 2.5, 2.5);
 
             // Ambient light color
-            renderer.gl.uniform3f(mesh.locations.uniforms.uAmbientLight, 0.1, 0.1, 0.1);
+            gl.uniform3f(mesh.locations.uniforms.uAmbientLight, 0.1, 0.1, 0.1);
 
             // Light direction
-            renderer.gl.uniform3f(mesh.locations.uniforms.uLightDirection, 0, -1, 1);
+            gl.uniform3f(mesh.locations.uniforms.uLightDirection, 0, -1, 1);
 
             // mesh.rotation.x += deltaTime
         }
         loadedMesh.addOnDrawCallback(setShading)
 
-        loadedMesh.loadTexture(renderer.gl, './assets/textures/crt_layout.jpg')
+        loadedMesh.loadTexture(gl, './assets/textures/crt_layout.jpg')
 
         meshes.push(loadedMesh)
     })
