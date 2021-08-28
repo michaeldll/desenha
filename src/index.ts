@@ -14,7 +14,7 @@ export default class Desenhador {
         }
     }
 
-    drawScene = (meshes: Mesh[], deltaTime: number) => {
+    draw = (meshes: Mesh[], deltaTime: number) => {
         resizeCanvasToDisplaySize(this.canvas, window.devicePixelRatio)
 
         // Tell WebGL how to convert from clip space to pixels

@@ -16,7 +16,7 @@ import Desenhador from "desenha"
 import Cube from "desenha/dist/meshes/cube"
 
 // Renderer AKA "Desenhador"
-const renderer = new Desenhador()
+const { gl, draw } = new Desenhador()
 
 // Shaders
 const vertex = `
@@ -49,7 +49,7 @@ const cube = new Cube({
     parameters: {
         position: { x: 0, y: 0, z: -10 }
     },
-    gl: renderer.gl
+    gl
 })
 
 // Executes callback each frame after being drawn
@@ -67,7 +67,7 @@ const update = (now: number) => {
     const deltaTime = now - then;
     then = now;
 
-    renderer.drawScene(meshes, deltaTime);
+    draw(meshes, deltaTime);
 
     requestAnimationFrame(update);
 }
@@ -80,7 +80,7 @@ requestAnimationFrame(update);
 Load shaders from files, load .obj model and shade it :
 
 ```ts
-const renderer = new Desenhador()
+const { gl } = new Desenhador()
 const loader = new OBJLoader()
 const meshes = []
 
@@ -108,7 +108,7 @@ fetchShaders('./assets/shaders/texturedShaded/vertex.glsl', './assets/shaders/te
             },
             parameters,
             geometry,
-            gl: renderer.gl
+            gl
         })
 
         const setShading = (mesh, deltaTime) => {
