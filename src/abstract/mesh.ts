@@ -1,4 +1,4 @@
-import { mat4 } from 'gl-matrix'
+import { mat4, vec3 } from 'gl-matrix'
 import { Locations, Buffers, Geometry, MeshConstructor, DrawCallback } from "../types"
 import { getShaderProgram } from '../utils'
 
@@ -9,11 +9,11 @@ export abstract class Mesh {
     geometry: Geometry
     program: WebGLProgram
     locations: Locations
-    modelMatrix: typeof mat4;
-    projectionMatrix: typeof mat4;
-    position: { x: number, y: number, z: number }
-    rotation: { x: number, y: number, z: number }
-    scale: { x: number, y: number, z: number }
+    modelMatrix: ReturnType<typeof mat4.create>
+    projectionMatrix: ReturnType<typeof mat4.create>
+    position: ReturnType<typeof vec3.create>
+    rotation: ReturnType<typeof vec3.create>
+    scale: ReturnType<typeof vec3.create>
     onDrawCallbacks: DrawCallback[]
 
     constructor({ shaders, name, locationNames, parameters, gl }: MeshConstructor) {
@@ -32,14 +32,14 @@ export abstract class Mesh {
             this.locations.uniforms[uniformName] = gl.getUniformLocation(this.program, uniformName)
         }
 
-        this.position = { x: 0, y: 0, z: 0 }
-        this.rotation = { x: 0, y: 0, z: 0 }
-        this.scale = { x: 1, y: 1, z: 1 }
+        this.position = vec3.fromValues(0, 0, 0)
+        this.rotation = vec3.fromValues(0, 0, 0)
+        this.scale = vec3.fromValues(1, 1, 1)
 
         if (parameters) {
-            if (parameters.position) this.position = parameters.position
-            if (parameters.rotation) this.rotation = parameters.rotation
-            if (parameters.scale) this.scale = parameters.scale
+            if (parameters.position) vec3.set(this.position, parameters.position.x, parameters.position.y, parameters.position.z)
+            if (parameters.rotation) vec3.set(this.rotation, parameters.rotation.x, parameters.rotation.y, parameters.rotation.z)
+            if (parameters.scale) vec3.set(this.scale, parameters.scale.x, parameters.scale.y, parameters.scale.z)
         }
 
         name ? this.name = name : this.name = ""
@@ -120,21 +120,21 @@ export abstract class Mesh {
 
         mat4.scale(this.modelMatrix,
             this.modelMatrix,
-            [this.scale.x, this.scale.y, this.scale.z])
+            [this.scale[0], this.scale[1], this.scale[2]])
         mat4.translate(this.modelMatrix,
             this.modelMatrix,
-            [this.position.x, this.position.y, this.position.z]);
+            [this.position[0], this.position[1], this.position[2]]);
         mat4.rotate(this.modelMatrix,
             this.modelMatrix,
-            this.rotation.x,     // amount to rotate in radians
+            this.rotation[0],     // amount to rotate in radians
             [1, 0, 0]);       // axis to rotate around (X)
         mat4.rotate(this.modelMatrix,  // destination matrix
             this.modelMatrix,
-            this.rotation.y,// amount to rotate in radians
+            this.rotation[1],// amount to rotate in radians
             [0, 1, 0]);       // axis to rotate around (X)
         mat4.rotate(this.modelMatrix,
             this.modelMatrix,
-            this.rotation.z,     // amount to rotate in radians
+            this.rotation[2],     // amount to rotate in radians
             [0, 0, 1]);       // axis to rotate around (Z)
 
         // Set shader uniforms
