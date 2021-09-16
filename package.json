@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/michaeldll/desenha/issues"
   },
-  "homepage": "https://github.com/michaeldll/desenha#readme"
+  "homepage": "https://github.com/michaeldll/desenha#readme",
+  "dependencies": {
+    "gl-matrix": "^3.3.0"
+  }
 }
