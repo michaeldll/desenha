@@ -4,8 +4,8 @@ export default class Desenhador {
     canvas: HTMLCanvasElement
     gl: WebGLRenderingContext
 
-    constructor(options: WebGLContextAttributes = { powerPreference: "high-performance" }) {
-        this.canvas = document.querySelector('canvas');
+    constructor(canvas: HTMLCanvasElement, options: WebGLContextAttributes = { powerPreference: "high-performance" }) {
+        this.canvas = canvas
         this.gl = this.canvas.getContext('webgl', options);
 
         if (!this.gl) {
