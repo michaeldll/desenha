@@ -1,5 +1,5 @@
 # desenha
-A (very) barebones WebGL framework.
+A (very) barebones WebGL framework. Heavily inspired by https://webglfundamentals.org/.
 
 ## Why should I use this framework ?
 You probably shouldn't.
