@@ -1,6 +1,6 @@
 {
   "name": "desenha",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "A barebones WebGL framework",
   "main": "dist/index.ts",
   "types": "dist/index.d.ts",
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/michaeldll/desenha#readme",
   "dependencies": {
-    "gl-matrix": "^3.3.0"
+    "gl-matrix": "^3.3.0",
+    "typescript": "^5.0.4"
   }
 }
