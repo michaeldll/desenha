@@ -6,10 +6,10 @@ export type Buffers = {
 
 export type Locations = {
     attributes: {
-        [attributeName: string]: WebGLUniformLocation | -1
+        [attributeName: string]: number
     },
     uniforms: {
-        [uniformName: string]: WebGLUniformLocation | null
+        [uniformName: string]: number | null
     }
 }
 
@@ -44,4 +44,4 @@ export type MeshConstructor = {
     name?: string
 }
 
-export type DrawCallback = (mesh: Mesh, deltaTime: number) => void
+export type DrawCallback = (mesh: Mesh, deltaTime: number, elapsedTime: number) => void

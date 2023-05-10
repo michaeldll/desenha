@@ -15,6 +15,7 @@ export abstract class Mesh {
     rotation: ReturnType<typeof vec3.create>
     scale: ReturnType<typeof vec3.create>
     onDrawCallbacks: DrawCallback[]
+    static = false
 
     constructor({ shaders, name, locationNames, parameters, gl }: MeshConstructor) {
         this.geometry = {}
@@ -29,7 +30,7 @@ export abstract class Mesh {
             this.locations.attributes[attributeName] = gl.getAttribLocation(this.program, attributeName)
         }
         for (const uniformName of locationNames.uniforms) {
-            this.locations.uniforms[uniformName] = gl.getUniformLocation(this.program, uniformName)
+            this.locations.uniforms[uniformName] = gl.getUniformLocation(this.program, uniformName) as number
         }
 
         this.position = vec3.fromValues(0, 0, 0)
@@ -280,7 +281,7 @@ export abstract class Mesh {
     }
 
     // LINE_LOOP for wireframe-like aspect
-    draw = (gl: WebGLRenderingContext, mode: WebGLRenderingContextBase["TRIANGLES"] | WebGLRenderingContextBase["LINES"] | WebGLRenderingContextBase["LINE_LOOP"], deltaTime: number) => {
+    draw = (gl: WebGLRenderingContext, mode: WebGLRenderingContextBase["TRIANGLES"] | WebGLRenderingContextBase["LINES"] | WebGLRenderingContextBase["LINE_LOOP"], deltaTime: number, elapsedTime: number) => {
         if (typeof this.geometry.indices !== "undefined" && this.geometry.indices.length && this.geometry.positions) {
             const vertexCount = this.geometry.positions.length / (this.geometry.positions.length / this.geometry.indices.length);
             const type = gl.UNSIGNED_SHORT;
@@ -311,7 +312,7 @@ export abstract class Mesh {
         }
 
         for (const callback of this.onDrawCallbacks) {
-            callback(this, deltaTime)
+            callback(this, deltaTime, elapsedTime)
         }
     }
 }

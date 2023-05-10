@@ -3,10 +3,12 @@ import { Mesh } from './abstract/mesh';
 export default class Desenhador {
     canvas: HTMLCanvasElement
     gl: WebGLRenderingContext
+    dpr: number
 
     constructor(canvas: HTMLCanvasElement, options: WebGLContextAttributes = { powerPreference: "high-performance" }) {
         this.canvas = canvas
         this.gl = this.canvas.getContext('webgl', options);
+        this.dpr = Math.min(window.devicePixelRatio, 2)
 
         if (!this.gl) {
             alert('Unable to initialize WebGL. Your browser or machine may not support it.');
@@ -14,7 +16,7 @@ export default class Desenhador {
         }
     }
 
-    draw = (meshes: Mesh[], deltaTime: number) => {
+    draw = (meshes: Mesh[], deltaTime: number, elapsedTime: number) => {
         resizeCanvasToDisplaySize(this.canvas, window.devicePixelRatio)
 
         // Tell WebGL how to convert from clip space to pixels
@@ -32,11 +34,11 @@ export default class Desenhador {
 
             this.gl.useProgram(mesh.program);
 
-            mesh.calcMatrixes(this.gl)
+            if(!mesh.static) mesh.calcMatrixes(this.gl)
 
             mesh.getAttributesFromBuffers(this.gl)
 
-            mesh.draw(this.gl, this.gl.TRIANGLES, deltaTime)
+            mesh.draw(this.gl, this.gl.TRIANGLES, deltaTime, elapsedTime)
         }
     }
 }
