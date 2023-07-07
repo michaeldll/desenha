@@ -1,21 +1,14 @@
 # desenha
-A (very) barebones WebGL framework. Heavily inspired by https://webglfundamentals.org/.
+A barebones WebGL library. Heavily inspired by https://webglfundamentals.org/ and OGL.
+You probably shouldn't use this.
 
-## Why should I use this framework ?
-You probably shouldn't.
-
-## How do I use this framework ?
-`npm i desenha`
-
-## Examples :
-
-Rotating cube :
+## Example :
 
 ```ts
 import Desenhador from "desenha"
 import Cube from "desenha/dist/meshes/cube"
 
-// Renderer AKA "Desenhador"
+// Renderer
 const { gl, draw } = new Desenhador()
 
 // Shaders
@@ -77,65 +70,9 @@ requestAnimationFrame(update);
 
 ![Red cube](https://i.imgur.com/ZoJGlo6.png)
 
-Load shaders from files, load .obj model and shade it :
-
-```ts
-const { gl } = new Desenhador()
-const loader = new OBJLoader()
-const meshes = []
-
-fetchShaders('./assets/shaders/texturedShaded/vertex.glsl', './assets/shaders/texturedShaded/fragment.glsl').then(({ vertex, fragment }) => {
-    loader.load('assets/models/monitor.obj').then((geometry) => {
-        const parameters = {
-            position: { x: 0, y: 0, z: -1.5 },
-            rotation: { x: 0, y: -0.5, z: 0 },
-            scale: { x: 1, y: 1, z: 1 }
-        }
-        const loadedMesh = new Generic({
-            name: 'monitor',
-            shaders: [vertex, fragment],
-            locationNames: {
-                attributes: ['aPosition', 'aNormal', 'aUv'],
-                uniforms: [
-                    'uProjectionMatrix',
-                    'uModelMatrix',
-                    'uLightColor',
-                    'uLightDirection',
-                    'uBaseColor',
-                    'uAmbientLight',
-                    'uTexture'
-                ]
-            },
-            parameters,
-            geometry,
-            gl
-        })
-
-        const setShading = (mesh, deltaTime) => {
-            // Base color
-            gl.uniform3f(mesh.locations.uniforms.uBaseColor, 1, 1, 1);
-
-            // Diffuse light color
-            gl.uniform3f(mesh.locations.uniforms.uLightColor, 2.5, 2.5, 2.5);
-
-            // Ambient light color
-            gl.uniform3f(mesh.locations.uniforms.uAmbientLight, 0.1, 0.1, 0.1);
-
-            // Light direction
-            gl.uniform3f(mesh.locations.uniforms.uLightDirection, 0, -1, 1);
-
-            // mesh.rotation.x += deltaTime
-        }
-        loadedMesh.addOnDrawCallback(setShading)
-
-        loadedMesh.loadTexture(gl, './assets/textures/crt_layout.jpg')
-
-        meshes.push(loadedMesh)
-    })
-})
-```
-
-![Shaded model](https://i.imgur.com/E9EdJXz.png)
+More examples available under `/examples`:
+- Fullscreen shader
+- Load and shade a .obj model
 
 ### What does 'desenha' mean ?
 It means 'draw' in Portuguese.
