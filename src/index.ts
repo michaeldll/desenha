@@ -1,9 +1,11 @@
 import { resizeCanvasToDisplaySize } from './utils'
 import { Mesh } from './abstract/mesh';
+
 export default class Desenhador {
-    canvas: HTMLCanvasElement
-    gl: WebGLRenderingContext
-    dpr: number
+    public canvas: HTMLCanvasElement
+    public gl: WebGLRenderingContext
+    public dpr: number
+    public clearColor: [number, number, number, number] = [0.0, 0.0, 0.0, 1.0]
 
     constructor(canvas: HTMLCanvasElement, options: WebGLContextAttributes = { powerPreference: "high-performance" }) {
         this.canvas = canvas
@@ -22,7 +24,7 @@ export default class Desenhador {
         // Tell WebGL how to convert from clip space to pixels
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
 
-        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl.clearColor(...this.clearColor);
         this.gl.clearDepth(1.0);
         this.gl.enable(this.gl.DEPTH_TEST);           // Enable depth testing
         this.gl.depthFunc(this.gl.LEQUAL);            // Near things obscure far things
