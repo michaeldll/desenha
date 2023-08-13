@@ -1,5 +1,5 @@
 # desenha
-A barebones WebGL library. Heavily inspired by https://webglfundamentals.org/ and OGL.
+A barebones WebGL library. Inspired by https://webglfundamentals.org/ and [OGL](https://github.com/oframe/ogl).
 You probably shouldn't use this.
 
 ## Example :
