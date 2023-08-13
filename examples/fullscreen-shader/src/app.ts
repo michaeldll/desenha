@@ -2,10 +2,6 @@ import "./scss/global.scss";
 import Desenhador from "../../../src/renderer";
 import Plane from "../../../src/meshes/plane";
 
-type Window = typeof window & {
-    IS_PRODUCTION: boolean;
-};
-
 // Renderer
 const { gl, draw, canvas, dpr } = new Desenhador(document.querySelector(".canvas-gl"))
 
@@ -75,8 +71,3 @@ const update = (now: number) => {
 }
 
 requestAnimationFrame(update);
-
-// Enable hot reloading in development
-if (!(window as Window).IS_PRODUCTION) {
-    new EventSource('/esbuild').addEventListener('change', () => location.reload())
-};
