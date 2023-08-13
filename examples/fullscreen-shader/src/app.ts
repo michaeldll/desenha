@@ -1,5 +1,5 @@
 import "./scss/global.scss";
-import Desenhador from "../../../src";
+import Desenhador from "../../../src/renderer";
 import Plane from "../../../src/meshes/plane";
 
 type Window = typeof window & {
