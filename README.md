@@ -5,8 +5,7 @@ You probably shouldn't use this.
 ## Example :
 
 ```ts
-import Desenhador from "desenha"
-import Cube from "desenha/dist/meshes/cube"
+import { Desenhador, Cube } from "desenha"
 
 // Renderer
 const { gl, draw } = new Desenhador()
@@ -47,8 +46,8 @@ const cube = new Cube({
 
 // Executes callback each frame after being drawn
 cube.addOnDrawCallback((mesh, deltaTime) => {
-    mesh.rotation.x += deltaTime * 0.5
-    mesh.rotation.y += deltaTime
+    mesh.rotation[0] += 0.01
+    mesh.rotation[1] += 0.01
 })
 
 meshes.push(cube)
@@ -56,7 +55,6 @@ meshes.push(cube)
 // Render loop
 let then = 0;
 const update = (now: number) => {
-    now *= 0.001;  // Convert to seconds
     const deltaTime = now - then;
     then = now;
 
