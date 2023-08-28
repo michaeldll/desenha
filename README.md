@@ -70,6 +70,7 @@ requestAnimationFrame(update);
 
 More examples available under `/examples`:
 - Fullscreen shader
+- OBJ model and texture loading
 
 ### What does 'desenha' mean ?
 It means 'draw' in Portuguese.
