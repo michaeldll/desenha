@@ -5,6 +5,7 @@
   "main": "./index.ts",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "bp": "npm version patch && npm publish",
     "prepare": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
