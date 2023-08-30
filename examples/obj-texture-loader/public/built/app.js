@@ -1701,19 +1701,22 @@ body {
         this.onDrawCallbacks.push(callback);
       };
       // Set a 2D texture
-      this.loadTexture = (gl2, path) => new Promise((resolve) => {
+      this.loadTexture = (gl2, path, uniform = "uTexture", options = { flip: true, minFilter: gl2.LINEAR, magFilter: gl2.LINEAR, wrapS: gl2.CLAMP_TO_EDGE, wrapT: gl2.CLAMP_TO_EDGE }) => new Promise((resolve) => {
         const texture = gl2.createTexture();
         const image = new Image();
         image.src = path;
         image.onload = () => {
-          gl2.pixelStorei(gl2.UNPACK_FLIP_Y_WEBGL, 1);
+          options.flip && gl2.pixelStorei(gl2.UNPACK_FLIP_Y_WEBGL, 1);
           gl2.activeTexture(gl2.TEXTURE0);
           gl2.bindTexture(gl2.TEXTURE_2D, texture);
-          gl2.texParameteri(gl2.TEXTURE_2D, gl2.TEXTURE_MIN_FILTER, gl2.LINEAR);
+          gl2.texParameteri(gl2.TEXTURE_2D, gl2.TEXTURE_MIN_FILTER, options.minFilter);
+          gl2.texParameteri(gl2.TEXTURE_2D, gl2.TEXTURE_MAG_FILTER, options.magFilter);
+          gl2.texParameteri(gl2.TEXTURE_2D, gl2.TEXTURE_WRAP_S, options.wrapS);
+          gl2.texParameteri(gl2.TEXTURE_2D, gl2.TEXTURE_WRAP_T, options.wrapT);
           gl2.texImage2D(gl2.TEXTURE_2D, 0, gl2.RGB, gl2.RGB, gl2.UNSIGNED_BYTE, image);
           gl2.generateMipmap(gl2.TEXTURE_2D);
           gl2.useProgram(this.program);
-          gl2.uniform1i(this.locations.uniforms.texture, 0);
+          gl2.uniform1i(this.locations.uniforms[uniform], 0);
           resolve();
         };
       });

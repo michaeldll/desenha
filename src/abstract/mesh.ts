@@ -51,14 +51,14 @@ export abstract class Mesh {
     }
 
     // Set a 2D texture
-    loadTexture = (gl: WebGLRenderingContext, path: string) =>
+    loadTexture = (gl: WebGLRenderingContext, path: string, uniform = "uTexture", options = { flip: true, minFilter: gl.LINEAR, magFilter: gl.LINEAR, wrapS: gl.CLAMP_TO_EDGE, wrapT: gl.CLAMP_TO_EDGE }) =>
         new Promise((resolve: (value: void) => void) => {
             const texture = gl.createTexture();
             const image = new Image();
             image.src = path;
             image.onload = () => {
                 // Flip the image's y axis
-                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+                options.flip && gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
 
                 // Enable texture 0
                 gl.activeTexture(gl.TEXTURE0);
@@ -66,8 +66,11 @@ export abstract class Mesh {
                 // Set the texture's target (2D or cubemap)
                 gl.bindTexture(gl.TEXTURE_2D, texture);
 
-                // Stretch/wrap options
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                // Stretch/wrap/filter options
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, options.minFilter);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, options.magFilter);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, options.wrapS);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, options.wrapT);
 
                 // Bind image to texture
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
@@ -77,7 +80,7 @@ export abstract class Mesh {
 
                 // Pass texture 0 to the sampler
                 gl.useProgram(this.program);
-                gl.uniform1i(this.locations.uniforms.texture, 0);
+                gl.uniform1i(this.locations.uniforms[uniform], 0);
                 resolve()
             }
         })

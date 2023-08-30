@@ -48,8 +48,6 @@ fetchShaders('./assets/vertex.glsl', './assets/fragment.glsl').then(({ vertex, f
 
             // Light direction
             gl.uniform3f(mesh.locations.uniforms.uLightDirection, 0, -1, 1);
-
-            // mesh.rotation.x += deltaTime
         }
         loadedMesh.addOnDrawCallback(setShading)
 
