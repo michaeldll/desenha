@@ -51,13 +51,7 @@ export abstract class Mesh {
     }
 
     // Set a 2D texture
-    loadTexture = (gl: WebGLRenderingContext, path: string, uniform = "uTexture", options: TextureOptions = { 
-        flip: true, 
-        minFilter: gl.LINEAR, 
-        magFilter: gl.LINEAR, 
-        wrapS: gl.CLAMP_TO_EDGE, 
-        wrapT: gl.CLAMP_TO_EDGE 
-    }) =>
+    loadTexture = (gl: WebGLRenderingContext, path: string, uniform = "uTexture", options: TextureOptions) =>
         new Promise((resolve: (value: void) => void) => {
             const texture = gl.createTexture();
             const image = new Image();
