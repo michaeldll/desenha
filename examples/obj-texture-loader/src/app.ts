@@ -51,7 +51,14 @@ fetchShaders('./assets/vertex.glsl', './assets/fragment.glsl').then(({ vertex, f
         }
         loadedMesh.addOnDrawCallback(setShading)
 
-        loadedMesh.loadTexture(gl, './assets/monitor.jpg')
+        loadedMesh.loadTexture(gl, './assets/monitor.jpg', 'uTexture', {
+            minFilter: gl.LINEAR_MIPMAP_LINEAR,
+            magFilter: gl.LINEAR,
+            wrapS: gl.CLAMP_TO_EDGE,
+            wrapT: gl.CLAMP_TO_EDGE,
+            flip: true,
+            mipmap: true
+        })
 
         meshes.push(loadedMesh)
 

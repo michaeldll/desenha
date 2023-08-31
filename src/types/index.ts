@@ -46,4 +46,4 @@ export type MeshConstructor = {
 
 export type DrawCallback = (mesh: Mesh, deltaTime: number, elapsedTime: number) => void
 
-export type TextureOptions = { flip?: boolean, minFilter?: number, magFilter?: number, wrapS?: number, wrapT?: number }
+export type TextureOptions = { flip?: boolean, mipmap?: boolean, minFilter?: number, magFilter?: number, wrapS?: number, wrapT?: number }

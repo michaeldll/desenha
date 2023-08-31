@@ -76,7 +76,7 @@ export abstract class Mesh {
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
 
                 // Mipmaps
-                gl.generateMipmap(gl.TEXTURE_2D);
+                options.mipmap && gl.generateMipmap(gl.TEXTURE_2D);
 
                 // Pass texture 0 to the sampler
                 gl.useProgram(this.program);
