@@ -1,5 +1,5 @@
 import { mat4, vec3 } from 'gl-matrix'
-import { Locations, Buffers, Geometry, MeshConstructor, DrawCallback } from "../types"
+import { Locations, Buffers, Geometry, MeshConstructor, DrawCallback, TextureOptions } from "../types"
 import { getShaderProgram } from '../utils'
 
 export abstract class Mesh {
@@ -51,7 +51,13 @@ export abstract class Mesh {
     }
 
     // Set a 2D texture
-    loadTexture = (gl: WebGLRenderingContext, path: string, uniform = "uTexture", options = { flip: true, minFilter: gl.LINEAR, magFilter: gl.LINEAR, wrapS: gl.CLAMP_TO_EDGE, wrapT: gl.CLAMP_TO_EDGE }) =>
+    loadTexture = (gl: WebGLRenderingContext, path: string, uniform = "uTexture", options: TextureOptions = { 
+        flip: true, 
+        minFilter: gl.LINEAR, 
+        magFilter: gl.LINEAR, 
+        wrapS: gl.CLAMP_TO_EDGE, 
+        wrapT: gl.CLAMP_TO_EDGE 
+    }) =>
         new Promise((resolve: (value: void) => void) => {
             const texture = gl.createTexture();
             const image = new Image();
