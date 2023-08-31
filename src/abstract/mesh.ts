@@ -77,10 +77,7 @@ export abstract class Mesh {
 
                 // Mipmaps
                 options.mipmap && gl.generateMipmap(gl.TEXTURE_2D);
-
-                // Pass texture 0 to the sampler
-                gl.useProgram(this.program);
-                gl.uniform1i(this.locations.uniforms[uniform], 0);
+                
                 resolve()
             }
         })
