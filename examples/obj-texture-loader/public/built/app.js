@@ -1696,32 +1696,44 @@ body {
   // ../../src/abstract/mesh.ts
   var Mesh = class {
     constructor({ shaders, name, locationNames, parameters, gl: gl2 }) {
+      this.readyToRender = true;
+      this.buffers = {};
+      this.geometry = {};
+      this.locations = { attributes: {}, uniforms: {} };
+      this.textures = [];
+      this.modelMatrix = mat4_exports.create();
+      this.projectionMatrix = mat4_exports.create();
+      this.position = vec3_exports.fromValues(0, 0, 0);
+      this.rotation = vec3_exports.fromValues(0, 0, 0);
+      this.scale = vec3_exports.fromValues(1, 1, 1);
+      this.onBeforeDrawCallbacks = [];
+      this.onDrawCallbacks = [];
       this.static = false;
       this.addOnDrawCallback = (callback) => {
         this.onDrawCallbacks.push(callback);
       };
+      this.addOnBeforeDrawCallback = (callback) => {
+        this.onBeforeDrawCallbacks.push(callback);
+      };
       // Set a 2D texture
-      this.loadTexture = (gl2, path, uniform = "uTexture", options = { flip: true, minFilter: gl2.LINEAR, magFilter: gl2.LINEAR, wrapS: gl2.CLAMP_TO_EDGE, wrapT: gl2.CLAMP_TO_EDGE }) => new Promise((resolve) => {
+      this.loadTexture = (gl2, path, uniform = "uTexture", options) => new Promise((resolve) => {
         const texture = gl2.createTexture();
+        this.textures.push(texture);
         const image = new Image();
         image.src = path;
         image.onload = () => {
           options.flip && gl2.pixelStorei(gl2.UNPACK_FLIP_Y_WEBGL, 1);
-          gl2.activeTexture(gl2.TEXTURE0);
           gl2.bindTexture(gl2.TEXTURE_2D, texture);
           gl2.texParameteri(gl2.TEXTURE_2D, gl2.TEXTURE_MIN_FILTER, options.minFilter);
           gl2.texParameteri(gl2.TEXTURE_2D, gl2.TEXTURE_MAG_FILTER, options.magFilter);
           gl2.texParameteri(gl2.TEXTURE_2D, gl2.TEXTURE_WRAP_S, options.wrapS);
           gl2.texParameteri(gl2.TEXTURE_2D, gl2.TEXTURE_WRAP_T, options.wrapT);
           gl2.texImage2D(gl2.TEXTURE_2D, 0, gl2.RGB, gl2.RGB, gl2.UNSIGNED_BYTE, image);
-          gl2.generateMipmap(gl2.TEXTURE_2D);
-          gl2.useProgram(this.program);
-          gl2.uniform1i(this.locations.uniforms[uniform], 0);
+          options.mipmap && gl2.generateMipmap(gl2.TEXTURE_2D);
           resolve();
         };
       });
       this.calcMatrixes = (gl2) => {
-        this.projectionMatrix = mat4_exports.create();
         {
           const glCanvas = gl2.canvas;
           const fieldOfView = 45 * Math.PI / 180;
@@ -1736,7 +1748,7 @@ body {
             zFar
           );
         }
-        this.modelMatrix = mat4_exports.create();
+        mat4_exports.identity(this.modelMatrix);
         mat4_exports.scale(
           this.modelMatrix,
           this.modelMatrix,
@@ -1888,6 +1900,9 @@ body {
       };
       // LINE_LOOP for wireframe-like aspect
       this.draw = (gl2, mode, deltaTime, elapsedTime) => {
+        for (const callback of this.onBeforeDrawCallbacks) {
+          callback(this, deltaTime, elapsedTime);
+        }
         if (typeof this.geometry.indices !== "undefined" && this.geometry.indices.length && this.geometry.positions) {
           const vertexCount = this.geometry.positions.length / (this.geometry.positions.length / this.geometry.indices.length);
           const type = gl2.UNSIGNED_SHORT;
@@ -1922,11 +1937,6 @@ body {
           callback(this, deltaTime, elapsedTime);
         }
       };
-      this.geometry = {};
-      this.buffers = {};
-      this.locations = { attributes: {}, uniforms: {} };
-      this.readyToRender = true;
-      this.onDrawCallbacks = [];
       this.program = getShaderProgram(gl2, shaders[0], shaders[1]);
       for (const attributeName of locationNames.attributes) {
         this.locations.attributes[attributeName] = gl2.getAttribLocation(this.program, attributeName);
@@ -1934,9 +1944,6 @@ body {
       for (const uniformName of locationNames.uniforms) {
         this.locations.uniforms[uniformName] = gl2.getUniformLocation(this.program, uniformName);
       }
-      this.position = vec3_exports.fromValues(0, 0, 0);
-      this.rotation = vec3_exports.fromValues(0, 0, 0);
-      this.scale = vec3_exports.fromValues(1, 1, 1);
       if (parameters) {
         if (parameters.position)
           vec3_exports.set(this.position, parameters.position.x, parameters.position.y, parameters.position.z);
@@ -2097,7 +2104,14 @@ body {
         gl.uniform3f(mesh.locations.uniforms.uLightDirection, 0, -1, 1);
       };
       loadedMesh.addOnDrawCallback(setShading);
-      loadedMesh.loadTexture(gl, "./assets/monitor.jpg");
+      loadedMesh.loadTexture(gl, "./assets/monitor.jpg", "uTexture", {
+        minFilter: gl.LINEAR_MIPMAP_LINEAR,
+        magFilter: gl.LINEAR,
+        wrapS: gl.CLAMP_TO_EDGE,
+        wrapT: gl.CLAMP_TO_EDGE,
+        flip: true,
+        mipmap: true
+      });
       meshes.push(loadedMesh);
       let then = 0;
       let elapsedTime = 0;

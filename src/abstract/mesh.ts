@@ -4,26 +4,22 @@ import { getShaderProgram } from '../utils'
 
 export abstract class Mesh {
     name: string
-    readyToRender: boolean
-    buffers: Buffers
-    geometry: Geometry
+    readyToRender: boolean = true
+    buffers: Buffers = {}
+    geometry: Geometry = {}
     program: WebGLProgram
-    locations: Locations
-    modelMatrix: ReturnType<typeof mat4.create>
-    projectionMatrix: ReturnType<typeof mat4.create>
-    position: ReturnType<typeof vec3.create>
-    rotation: ReturnType<typeof vec3.create>
-    scale: ReturnType<typeof vec3.create>
-    onDrawCallbacks: DrawCallback[]
+    locations: Locations = { attributes: {}, uniforms: {} }
+    textures: WebGLTexture[] = []
+    modelMatrix = mat4.create();
+    projectionMatrix = mat4.create();
+    position = vec3.fromValues(0, 0, 0)
+    rotation = vec3.fromValues(0, 0, 0)
+    scale = vec3.fromValues(1, 1, 1)
+    onBeforeDrawCallbacks: DrawCallback[] = []
+    onDrawCallbacks: DrawCallback[] = []
     static = false
 
     constructor({ shaders, name, locationNames, parameters, gl }: MeshConstructor) {
-        this.geometry = {}
-        this.buffers = {}
-        this.locations = { attributes: {}, uniforms: {} }
-        this.readyToRender = true
-        this.onDrawCallbacks = []
-
         this.program = getShaderProgram(gl, shaders[0], shaders[1])
 
         for (const attributeName of locationNames.attributes) {
@@ -32,10 +28,6 @@ export abstract class Mesh {
         for (const uniformName of locationNames.uniforms) {
             this.locations.uniforms[uniformName] = gl.getUniformLocation(this.program, uniformName) as number
         }
-
-        this.position = vec3.fromValues(0, 0, 0)
-        this.rotation = vec3.fromValues(0, 0, 0)
-        this.scale = vec3.fromValues(1, 1, 1)
 
         if (parameters) {
             if (parameters.position) vec3.set(this.position, parameters.position.x, parameters.position.y, parameters.position.z)
@@ -50,18 +42,20 @@ export abstract class Mesh {
         this.onDrawCallbacks.push(callback)
     }
 
+    addOnBeforeDrawCallback = (callback: DrawCallback) => {
+        this.onBeforeDrawCallbacks.push(callback)
+    }
+
     // Set a 2D texture
     loadTexture = (gl: WebGLRenderingContext, path: string, uniform = "uTexture", options: TextureOptions) =>
         new Promise((resolve: (value: void) => void) => {
             const texture = gl.createTexture();
+            this.textures.push(texture)
             const image = new Image();
             image.src = path;
             image.onload = () => {
                 // Flip the image's y axis
                 options.flip && gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-
-                // Enable texture 0
-                gl.activeTexture(gl.TEXTURE0);
 
                 // Set the texture's target (2D or cubemap)
                 gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -83,9 +77,6 @@ export abstract class Mesh {
         })
 
     calcMatrixes = (gl: WebGLRenderingContext) => {
-        // Projection
-        this.projectionMatrix = mat4.create();
-
         // Perspective
         {
             const glCanvas = gl.canvas as HTMLCanvasElement
@@ -117,7 +108,7 @@ export abstract class Mesh {
         //     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far)
         // }
 
-        this.modelMatrix = mat4.create();
+        mat4.identity(this.modelMatrix);
 
         mat4.scale(this.modelMatrix,
             this.modelMatrix,
@@ -282,6 +273,10 @@ export abstract class Mesh {
 
     // LINE_LOOP for wireframe-like aspect
     draw = (gl: WebGLRenderingContext, mode: WebGLRenderingContextBase["TRIANGLES"] | WebGLRenderingContextBase["LINES"] | WebGLRenderingContextBase["LINE_LOOP"], deltaTime: number, elapsedTime: number) => {
+        for (const callback of this.onBeforeDrawCallbacks) {
+            callback(this, deltaTime, elapsedTime)
+        }
+
         if (typeof this.geometry.indices !== "undefined" && this.geometry.indices.length && this.geometry.positions) {
             const vertexCount = this.geometry.positions.length / (this.geometry.positions.length / this.geometry.indices.length);
             const type = gl.UNSIGNED_SHORT;
