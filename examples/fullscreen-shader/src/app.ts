@@ -1,6 +1,6 @@
 import "./scss/global.scss";
 import Desenhador from "../../../src/renderer";
-import planeGeometry from "../../../src/geometries/plane";
+import planeGeometry from "../../../src/geometries/planeGeometry";
 import Mesh from "../../../src/abstract/mesh";
 
 // Renderer

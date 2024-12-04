@@ -1897,6 +1897,7 @@ body {
           this.modelMatrix
         );
       };
+      // attributes: aPosition, aColor, aUv, aNormal
       this.getAttributesFromBuffers = (gl2) => {
         const { positions, indices, colors, uvs, normals } = this.buffers;
         if (positions && this.locations.attributes.aPosition > -1) {

@@ -144,6 +144,7 @@ export default class Mesh {
             this.modelMatrix);
     }
 
+    // attributes: aPosition, aColor, aUv, aNormal
     getAttributesFromBuffers = (gl: WebGLRenderingContext) => {
         const { positions, indices, colors, uvs, normals } = this.buffers
 
