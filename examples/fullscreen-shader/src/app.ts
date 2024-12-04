@@ -1,6 +1,7 @@
 import "./scss/global.scss";
 import Desenhador from "../../../src/renderer";
-import Plane from "../../../src/meshes/plane";
+import planeGeometry from "../../../src/geometries/plane";
+import Mesh from "../../../src/abstract/mesh";
 
 // Renderer
 const { gl, draw, canvas, dpr } = new Desenhador(document.querySelector(".canvas-gl"))
@@ -33,7 +34,8 @@ const fragment = /*glsl*/`
 const meshes = []
 
 // Init mesh
-const plane = new Plane({
+const plane = new Mesh({
+    geometry: planeGeometry,
     name: 'Plane',
     shaders: [vertex, fragment],
     locationNames: {

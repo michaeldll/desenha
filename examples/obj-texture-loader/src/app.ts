@@ -2,8 +2,8 @@ import "./scss/global.scss";
 
 import Desenhador from "../../../src/renderer";
 import { fetchShaders } from "../../../src/utils";
-import Generic from "../../../src/meshes/generic";
 import OBJLoader from "../../../src/loaders/OBJLoader";
+import Mesh from "../../../src/abstract/mesh";
 
 const { gl, draw } = new Desenhador(document.querySelector(".canvas-gl"))
 const loader = new OBJLoader()
@@ -16,7 +16,7 @@ fetchShaders('./assets/vertex.glsl', './assets/fragment.glsl').then(({ vertex, f
             rotation: { x: 0, y: -0.5, z: 0 },
             scale: { x: 1, y: 1, z: 1 }
         }
-        const loadedMesh = new Generic({
+        const loadedMesh = new Mesh({
             name: 'monitor',
             shaders: [vertex, fragment],
             locationNames: {

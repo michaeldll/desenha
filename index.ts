@@ -1,7 +1,6 @@
 import Desenhador from "./src/renderer";
-import Plane from "./src/meshes/plane";
-import Cube from "./src/meshes/cube";
-import Generic from "./src/meshes/generic";
-import { Mesh } from "./src/abstract/mesh";
+import Plane from "./src/geometries/plane";
+import Cube from "./src/geometries/cube";
+import Mesh from "./src/abstract/mesh";
 
-export { Desenhador, Plane, Cube, Generic, Mesh }
+export { Desenhador, Plane, Cube, Mesh }

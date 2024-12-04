@@ -1,5 +1,5 @@
 import { resizeCanvasToDisplaySize } from './utils'
-import { Mesh } from './abstract/mesh';
+import Mesh from './abstract/mesh';
 
 export default class Desenhador {
     public canvas: HTMLCanvasElement

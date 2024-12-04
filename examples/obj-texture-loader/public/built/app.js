@@ -69,13 +69,15 @@ body {
   var Desenhador = class {
     constructor(canvas, options = { powerPreference: "high-performance" }) {
       this.clearColor = [0, 0, 0, 1];
+      this.depthTest = true;
       this.draw = (meshes2, deltaTime, elapsedTime) => {
         resizeCanvasToDisplaySize(this.canvas, window.devicePixelRatio);
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
         this.gl.clearColor(...this.clearColor);
         this.gl.clearDepth(1);
-        this.gl.enable(this.gl.DEPTH_TEST);
-        this.gl.depthFunc(this.gl.LEQUAL);
+        if (this.depthTest)
+          this.gl.enable(this.gl.DEPTH_TEST);
+        this.gl.depthFunc(this.depthFunc);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         for (const mesh of meshes2) {
           if (!mesh.readyToRender)
@@ -89,11 +91,114 @@ body {
       };
       this.canvas = canvas;
       this.gl = this.canvas.getContext("webgl", options);
-      this.dpr = Math.min(window.devicePixelRatio, 2);
       if (!this.gl) {
         alert("Unable to initialize WebGL. Your browser or machine may not support it.");
         return;
       }
+      this.depthFunc = this.gl.LEQUAL;
+      this.dpr = Math.min(window.devicePixelRatio, 2);
+    }
+  };
+
+  // ../../src/loaders/OBJLoader.ts
+  var OBJLoader = class {
+    async load(url) {
+      const response = await fetch(url);
+      const textContent = await response.text();
+      const { positions, uvs, normals } = this.parse(textContent);
+      const geometry = {
+        positions: new Float32Array(positions),
+        uvs: new Float32Array(uvs),
+        normals: new Float32Array(normals)
+      };
+      return geometry;
+    }
+    // https://webglfundamentals.org/webgl/lessons/webgl-load-obj.html
+    parse(text) {
+      let objName = "";
+      const objPositions = [[0, 0, 0]];
+      const objUvs = [[0, 0]];
+      const objNormals = [[0, 0, 0]];
+      const objVertexData = [
+        objPositions,
+        objUvs,
+        objNormals
+      ];
+      let webglVertexData = [
+        [],
+        // positions
+        [],
+        // texcoords
+        []
+        // normals
+      ];
+      function addVertex(vert) {
+        const ptn = vert.split("/");
+        ptn.forEach((objIndexStr, i) => {
+          if (!objIndexStr) {
+            return;
+          }
+          const objIndex = parseInt(objIndexStr);
+          const index = objIndex + (objIndex >= 0 ? 0 : objVertexData[i].length);
+          webglVertexData[i].push(...objVertexData[i][index]);
+        });
+      }
+      const keywords = {
+        usemtl(parts) {
+        },
+        mtllib(parts) {
+        },
+        s(parts) {
+        },
+        o(parts) {
+          objName = parts[0];
+        },
+        v(parts) {
+          objPositions.push(parts.map(parseFloat));
+        },
+        vn(parts) {
+          objNormals.push(parts.map(parseFloat));
+        },
+        vt(parts) {
+          objUvs.push(parts.map(parseFloat));
+        },
+        f(parts) {
+          const numTriangles = parts.length - 2;
+          for (let tri = 0; tri < numTriangles; ++tri) {
+            addVertex(parts[0]);
+            addVertex(parts[tri + 1]);
+            addVertex(parts[tri + 2]);
+          }
+        }
+      };
+      const keywordRE = /(\w*)(?: )*(.*)/;
+      const lines = text.split("\n");
+      for (let lineNo = 0; lineNo < lines.length; ++lineNo) {
+        const line = lines[lineNo].trim();
+        if (line === "" || line.startsWith("#")) {
+          continue;
+        }
+        const m = keywordRE.exec(line);
+        if (!m) {
+          continue;
+        }
+        const [, keyword, unparsedArgs] = m;
+        const parts = line.split(/\s+/).slice(1);
+        const handler = keywords[keyword];
+        if (!handler) {
+          console.warn("unhandled keyword:", keyword);
+          continue;
+        }
+        handler(parts, unparsedArgs);
+      }
+      return {
+        objName,
+        positions: webglVertexData[0],
+        uvs: webglVertexData[1],
+        normals: webglVertexData[2]
+      };
+    }
+    createMesh() {
     }
   };
 
@@ -1695,7 +1800,7 @@ body {
 
   // ../../src/abstract/mesh.ts
   var Mesh = class {
-    constructor({ shaders, name, locationNames, parameters, gl: gl2 }) {
+    constructor({ geometry, shaders, name, locationNames, parameters, gl: gl2 }) {
       this.readyToRender = true;
       this.buffers = {};
       this.geometry = {};
@@ -1953,117 +2058,8 @@ body {
           vec3_exports.set(this.scale, parameters.scale.x, parameters.scale.y, parameters.scale.z);
       }
       name ? this.name = name : this.name = "";
-    }
-  };
-
-  // ../../src/meshes/generic.ts
-  var Generic = class extends Mesh {
-    constructor({ shaders, locationNames, gl: gl2, parameters, name, geometry }) {
-      super({ shaders, locationNames, gl: gl2, parameters, name });
       this.geometry = geometry;
       this.setBuffers(gl2);
-    }
-  };
-
-  // ../../src/loaders/OBJLoader.ts
-  var OBJLoader = class {
-    async load(url) {
-      const response = await fetch(url);
-      const textContent = await response.text();
-      const { positions, uvs, normals } = this.parse(textContent);
-      const geometry = {
-        positions: new Float32Array(positions),
-        uvs: new Float32Array(uvs),
-        normals: new Float32Array(normals)
-      };
-      return geometry;
-    }
-    // https://webglfundamentals.org/webgl/lessons/webgl-load-obj.html
-    parse(text) {
-      let objName = "";
-      const objPositions = [[0, 0, 0]];
-      const objUvs = [[0, 0]];
-      const objNormals = [[0, 0, 0]];
-      const objVertexData = [
-        objPositions,
-        objUvs,
-        objNormals
-      ];
-      let webglVertexData = [
-        [],
-        // positions
-        [],
-        // texcoords
-        []
-        // normals
-      ];
-      function addVertex(vert) {
-        const ptn = vert.split("/");
-        ptn.forEach((objIndexStr, i) => {
-          if (!objIndexStr) {
-            return;
-          }
-          const objIndex = parseInt(objIndexStr);
-          const index = objIndex + (objIndex >= 0 ? 0 : objVertexData[i].length);
-          webglVertexData[i].push(...objVertexData[i][index]);
-        });
-      }
-      const keywords = {
-        usemtl(parts) {
-        },
-        mtllib(parts) {
-        },
-        s(parts) {
-        },
-        o(parts) {
-          objName = parts[0];
-        },
-        v(parts) {
-          objPositions.push(parts.map(parseFloat));
-        },
-        vn(parts) {
-          objNormals.push(parts.map(parseFloat));
-        },
-        vt(parts) {
-          objUvs.push(parts.map(parseFloat));
-        },
-        f(parts) {
-          const numTriangles = parts.length - 2;
-          for (let tri = 0; tri < numTriangles; ++tri) {
-            addVertex(parts[0]);
-            addVertex(parts[tri + 1]);
-            addVertex(parts[tri + 2]);
-          }
-        }
-      };
-      const keywordRE = /(\w*)(?: )*(.*)/;
-      const lines = text.split("\n");
-      for (let lineNo = 0; lineNo < lines.length; ++lineNo) {
-        const line = lines[lineNo].trim();
-        if (line === "" || line.startsWith("#")) {
-          continue;
-        }
-        const m = keywordRE.exec(line);
-        if (!m) {
-          continue;
-        }
-        const [, keyword, unparsedArgs] = m;
-        const parts = line.split(/\s+/).slice(1);
-        const handler = keywords[keyword];
-        if (!handler) {
-          console.warn("unhandled keyword:", keyword);
-          continue;
-        }
-        handler(parts, unparsedArgs);
-      }
-      return {
-        objName,
-        positions: webglVertexData[0],
-        uvs: webglVertexData[1],
-        normals: webglVertexData[2]
-      };
-    }
-    createMesh() {
     }
   };
 
@@ -2078,7 +2074,7 @@ body {
         rotation: { x: 0, y: -0.5, z: 0 },
         scale: { x: 1, y: 1, z: 1 }
       };
-      const loadedMesh = new Generic({
+      const loadedMesh = new Mesh({
         name: "monitor",
         shaders: [vertex, fragment],
         locationNames: {

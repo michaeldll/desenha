@@ -1,4 +1,4 @@
-import { Mesh } from "../abstract/mesh"
+import Mesh from "../abstract/mesh"
 
 export type Buffers = {
     [bufferName: string]: WebGLBuffer | null
@@ -34,6 +34,7 @@ export type MeshParameters = {
 }
 
 export type MeshConstructor = {
+    geometry: Object,
     shaders: [string, string],
     locationNames: {
         attributes: string[]

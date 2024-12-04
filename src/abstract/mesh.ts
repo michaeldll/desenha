@@ -2,7 +2,7 @@ import { mat4, vec3 } from 'gl-matrix'
 import { Locations, Buffers, Geometry, MeshConstructor, DrawCallback, TextureOptions } from "../types"
 import { getShaderProgram } from '../utils'
 
-export abstract class Mesh {
+export default class Mesh {
     name: string
     readyToRender: boolean = true
     buffers: Buffers = {}
@@ -19,7 +19,7 @@ export abstract class Mesh {
     onDrawCallbacks: DrawCallback[] = []
     static = false
 
-    constructor({ shaders, name, locationNames, parameters, gl }: MeshConstructor) {
+    constructor({ geometry, shaders, name, locationNames, parameters, gl }: MeshConstructor) {
         this.program = getShaderProgram(gl, shaders[0], shaders[1])
 
         for (const attributeName of locationNames.attributes) {
@@ -36,6 +36,10 @@ export abstract class Mesh {
         }
 
         name ? this.name = name : this.name = ""
+
+        this.geometry = geometry
+
+        this.setBuffers(gl)
     }
 
     addOnDrawCallback = (callback: DrawCallback) => {
@@ -71,7 +75,7 @@ export abstract class Mesh {
 
                 // Mipmaps
                 options.mipmap && gl.generateMipmap(gl.TEXTURE_2D);
-                
+
                 resolve()
             }
         })
