@@ -1,6 +1,6 @@
 {
   "name": "desenha",
-  "version": "1.1.16",
+  "version": "1.1.17",
   "description": "A barebones WebGL framework",
   "main": "./index.ts",
   "types": "./dist/index.d.ts",
