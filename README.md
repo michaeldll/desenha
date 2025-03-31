@@ -72,5 +72,7 @@ More examples available under `/examples`:
 - Fullscreen shader
 - OBJ model and texture loading
 
+Run `npm i` and `npm run dev` in their folders.
+
 ### What does 'desenha' mean ?
 It means 'draw' in Portuguese.

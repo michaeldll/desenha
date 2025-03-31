@@ -1,1 +1,1 @@
-declare module 'gl-matrix'
+declare module "gl-matrix";

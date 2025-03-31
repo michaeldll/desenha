@@ -65,7 +65,7 @@ body {
     return false;
   }
 
-  // ../../src/renderer.ts
+  // ../../src/core/renderer.ts
   var Desenhador = class {
     constructor(canvas, options = { powerPreference: "high-performance" }) {
       this.clearColor = [0, 0, 0, 1];
@@ -119,11 +119,7 @@ body {
       const objPositions = [[0, 0, 0]];
       const objUvs = [[0, 0]];
       const objNormals = [[0, 0, 0]];
-      const objVertexData = [
-        objPositions,
-        objUvs,
-        objNormals
-      ];
+      const objVertexData = [objPositions, objUvs, objNormals];
       let webglVertexData = [
         [],
         // positions
@@ -197,8 +193,6 @@ body {
         uvs: webglVertexData[1],
         normals: webglVertexData[2]
       };
-    }
-    createMesh() {
     }
   };
 
@@ -1798,7 +1792,7 @@ body {
     };
   }();
 
-  // ../../src/abstract/mesh.ts
+  // ../../src/core/mesh.ts
   var Mesh = class {
     constructor({ geometry, shaders, name, locationNames, parameters, gl: gl2 }) {
       this.readyToRender = true;
@@ -2080,15 +2074,7 @@ body {
         shaders: [vertex, fragment],
         locationNames: {
           attributes: ["aPosition", "aNormal", "aUv"],
-          uniforms: [
-            "uProjectionMatrix",
-            "uModelMatrix",
-            "uLightColor",
-            "uLightDirection",
-            "uBaseColor",
-            "uAmbientLight",
-            "uTexture"
-          ]
+          uniforms: ["uProjectionMatrix", "uModelMatrix", "uLightColor", "uLightDirection", "uBaseColor", "uAmbientLight", "uTexture"]
         },
         parameters,
         geometry,
